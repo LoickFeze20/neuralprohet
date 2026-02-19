@@ -145,7 +145,7 @@ with st.sidebar:
     
     with st.expander("🔗 LSTM"):
         st.markdown("""
-        <a href="https://https://lstm-1.streamlit.app" target="_blank">
+        <a href="https://https:lstm-1.streamlit.app" target="_blank">
             <button style="
                 width: 100%;
                 padding: 0.75rem;
@@ -577,6 +577,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
