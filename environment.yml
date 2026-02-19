@@ -1,0 +1,15 @@
+name: streamlit-env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - streamlit
+  - pandas
+  - numpy
+  - plotly
+  - yfinance
+  - neuralprophet
+  - pytorch
+  - setuptools
+  - pip
