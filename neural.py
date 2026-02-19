@@ -259,6 +259,22 @@ with st.sidebar:
     
     # Chargement du modèle
     @st.cache_resource
+    def load_model():
+    try:
+        if os.path.exists("apple_neural.pt"):
+            st.sidebar.write("✅ Fichier trouvé, chargement...")
+            import pickle
+            with open("apple_neural.pt", 'rb') as f:
+                model = pickle.load(f)
+            st.sidebar.write("✅ Modèle chargé!")
+            return model
+        else:
+            st.sidebar.error("❌ Fichier non trouvé")
+            return None
+    except Exception as e:
+        st.sidebar.error(f"Erreur: {e}")
+        return Non
+        
     model = load_model()
     
     if model:
@@ -643,6 +659,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
