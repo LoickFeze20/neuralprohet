@@ -3,6 +3,6 @@ pandas
 numpy
 plotly
 yfinance
-neuralprophet==1.0.0rc9
-torch
+neuralprophet==0.5.0
+torch==1.13.1
 setuptools
