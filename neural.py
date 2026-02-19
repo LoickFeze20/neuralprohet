@@ -3,28 +3,22 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-import yfinance as yf
 from datetime import datetime, timedelta
 import warnings
+import time
 warnings.filterwarnings('ignore')
 
-# Configuration de la page - DOIT ÊTRE LA PREMIÈRE COMMANDE STREAMLIT
+# Configuration de la page
 st.set_page_config(
-    page_title="Apple Stock Predictor Pro",
+    page_title="Apple Stock Predictor",
     page_icon="📈",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# CSS personnalisé pour un style professionnel
+# CSS personnalisé
 st.markdown("""
 <style>
-    /* Style global */
-    .main {
-        background-color: #f8f9fa;
-    }
-    
-    /* En-tête principal */
     .main-header {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 2rem;
@@ -32,36 +26,26 @@ st.markdown("""
         color: white;
         margin-bottom: 2rem;
         box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        text-align: center;
     }
-    
     .main-header h1 {
         margin: 0;
         font-size: 2.5rem;
         font-weight: 700;
     }
-    
-    .main-header p {
-        margin: 0.5rem 0 0 0;
-        opacity: 0.9;
-        font-size: 1.1rem;
-    }
-    
-    /* Cartes de métriques */
     .metric-card {
         background: white;
         padding: 1.5rem;
         border-radius: 15px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         text-align: center;
-        transition: transform 0.3s ease;
         border: 1px solid #e9ecef;
+        transition: transform 0.3s ease;
     }
-    
     .metric-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 8px 15px rgba(0,0,0,0.1);
     }
-    
     .metric-label {
         color: #6c757d;
         font-size: 0.9rem;
@@ -69,19 +53,11 @@ st.markdown("""
         letter-spacing: 1px;
         margin-bottom: 0.5rem;
     }
-    
     .metric-value {
         font-size: 2rem;
         font-weight: 700;
         color: #212529;
     }
-    
-    .metric-delta {
-        font-size: 0.9rem;
-        margin-top: 0.5rem;
-    }
-    
-    /* Bouton de navigation */
     .nav-button {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
@@ -100,145 +76,163 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(102, 126, 234, 0.4);
         border: 1px solid rgba(255,255,255,0.2);
     }
-    
     .nav-button:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 15px rgba(102, 126, 234, 0.5);
     }
-    
-    /* Sidebar stylisée */
-    .sidebar-content {
-        background: linear-gradient(180deg, #2c3e50 0%, #3498db 100%);
-        padding: 2rem 1rem;
-        border-radius: 20px;
-        color: white;
-    }
-    
-    /* Badges */
-    .badge {
-        background-color: #e9ecef;
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        color: #495057;
-        display: inline-block;
-        margin: 0.25rem;
-    }
-    
-    .badge-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+    .footer {
+        text-align: center;
+        color: #6c757d;
+        padding: 20px;
+        font-size: 0.9rem;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# En-tête professionnel
+# En-tête
 st.markdown("""
 <div class="main-header">
-    <h1>📈 Apple Stock Predictor Pro</h1>
-    <p>Analyses avancées & prédictions intelligentes sur 30 jours</p>
+    <h1>🍎 Apple Stock Predictor </h1>
+    <p>Simulation intelligente • Mode démonstration</p>
 </div>
 """, unsafe_allow_html=True)
 
-@st.cache_data(ttl=3600)
-def get_apple_data():
-    """Récupérer les données Apple"""
-    try:
-        ticker = yf.Ticker("AAPL")
-        data = ticker.history(period="1y")
-        info = ticker.info
-        return data, info
-    except:
-        return None, None
+# Fonction pour générer des données simulées réalistes
+@st.cache_data(ttl=300)  # Cache 5 minutes
+def generate_simulated_data():
+    """Génère des données Apple simulées basées sur des prix réalistes"""
+    np.random.seed(42)
+    
+    # Prix de départ réaliste pour Apple (environ $175-180)
+    start_price = 175 + np.random.randn() * 5
+    
+    # Générer 365 jours de données
+    dates = pd.date_range(end=datetime.now(), periods=365, freq='D')
+    
+    # Simuler les prix avec une tendance haussière et de la volatilité
+    returns = np.random.normal(0.0005, 0.015, 365)  # 0.05% de tendance par jour
+    prices = start_price * np.exp(np.cumsum(returns))
+    
+    # Ajouter quelques variations pour rendre les données réalistes
+    noise = np.random.randn(365) * 0.5
+    prices = prices + noise
+    
+    # Simuler OHLC
+    df = pd.DataFrame(index=dates)
+    df['Close'] = prices
+    
+    # High/Low basés sur la volatilité
+    daily_volatility = prices * 0.01  # 1% de volatilité quotidienne
+    df['High'] = prices + np.abs(np.random.randn(365) * daily_volatility)
+    df['Low'] = prices - np.abs(np.random.randn(365) * daily_volatility)
+    df['Open'] = df['Close'].shift(1) + np.random.randn(365) * 0.3
+    df['Open'].fillna(df['Close'].iloc[0] * 0.99, inplace=True)
+    
+    # Volume
+    df['Volume'] = np.random.randint(50000000, 150000000, 365)
+    
+    return df
 
 def calculate_indicators(data):
     """Calculer les indicateurs techniques"""
     df = data.copy()
     
     # Moyennes mobiles
-    df['MA20'] = df['Close'].rolling(20).mean()
-    df['MA50'] = df['Close'].rolling(50).mean()
+    df['MA20'] = df['Close'].rolling(window=20).mean()
+    df['MA50'] = df['Close'].rolling(window=50).mean()
+    df['MA200'] = df['Close'].rolling(window=200).mean()
     
     # RSI
     delta = df['Close'].diff()
-    gain = (delta.where(delta > 0, 0)).rolling(14).mean()
-    loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
+    gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
     rs = gain / loss
     df['RSI'] = 100 - (100 / (1 + rs))
+    
+    # Remplacer les infinis
+    df['RSI'] = df['RSI'].fillna(50)
     
     return df
 
 def generate_predictions(data, days=30):
     """Générer des prédictions"""
     last_price = data['Close'].iloc[-1]
-    volatility = data['Close'].pct_change().std()
+    returns = data['Close'].pct_change().dropna()
+    volatility = returns.std()
+    avg_return = returns.mean()
     
-    # Simulation réaliste
+    # Simulation Monte Carlo
     np.random.seed(42)
-    returns = np.random.normal(0.0003, volatility, days)
-    predictions = last_price * np.exp(np.cumsum(returns))
+    n_simulations = 1000
+    simulations = []
     
-    # Intervalles de confiance
-    confidence = volatility * np.sqrt(np.arange(1, days + 1))
-    upper = predictions * np.exp(1.96 * confidence)
-    lower = predictions * np.exp(-1.96 * confidence)
+    for i in range(n_simulations):
+        prices = [last_price]
+        for j in range(days):
+            ret = np.random.normal(avg_return, volatility)
+            prices.append(prices[-1] * (1 + ret))
+        simulations.append(prices[1:])
     
-    return predictions, upper, lower
+    simulations = np.array(simulations)
+    
+    # Moyenne et intervalles
+    predictions = np.mean(simulations, axis=0)
+    lower = np.percentile(simulations, 2.5, axis=0)
+    upper = np.percentile(simulations, 97.5, axis=0)
+    
+    return predictions, lower, upper
 
-# Sidebar avec le bouton de navigation
+# Sidebar
 with st.sidebar:
-    # Logo et titre
-    st.image("https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg", width=80)
-    st.markdown("<h2 style='text-align: center;'>Menu</h2>", unsafe_allow_html=True)
+    st.image("https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg", width=100)
+    st.markdown("## Menu de navigation")
     
     st.markdown("---")
     
-    # LE BOUTON QUE VOUS AVEZ DEMANDÉ - Lien vers autre page
+    # LE BOUTON DEMANDÉ
     st.markdown("""
     <div style='text-align: center; margin: 20px 0;'>
-        <a href="http://localhost:8502" target="_blank">
+        <a href="https://lstm-1.streamlit.app" target="_blank">
             <button class="nav-button">
-                🚀 ACCÉDER AU DASHBOARD ANALYTIQUE
+                🚀 ANALYSE AVANCÉE
             </button>
         </a>
+        <p style='font-size: 0.8rem; color: #6c757d; margin-top: 5px;'>
+            Accéder au dashboard secondaire
+        </p>
     </div>
     """, unsafe_allow_html=True)
     
     st.markdown("---")
     
     # Paramètres
-    st.markdown("### ⚙️ Paramètres")
-    days_to_predict = st.slider("Horizon de prédiction", 5, 60, 30, 5)
-    confidence_level = st.select_slider("Niveau de confiance", 
-                                        options=[80, 85, 90, 95, 99], 
-                                        value=95)
+    st.markdown("### ⚙️ Configuration")
+    days_to_predict = st.slider(
+        "Horizon de prédiction (jours)",
+        min_value=5,
+        max_value=60,
+        value=30,
+        step=5
+    )
+    
+    show_indicators = st.checkbox("Afficher les indicateurs", value=True)
     
     st.markdown("---")
     
-    # Informations
-    st.markdown("### ℹ️ Informations")
-    st.markdown("""
-    <div style='background: #f8f9fa; padding: 1rem; border-radius: 10px;'>
-        <p style='margin: 0; color: #333;'>
-        📊 Données temps réel<br>
-        🔄 Mise à jour automatique<br>
-        📈 Analyses techniques<br>
-        🎯 Prédictions 30 jours
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+    # Mode de données
+    st.markdown("### ℹ️ Mode")
+    st.info("📊 Mode simulation • Données générées")
 
-# Chargement des données
-with st.spinner("Chargement des données Apple..."):
-    data, info = get_apple_data()
+# Génération des données
+with st.spinner("Génération des données de simulation..."):
+    data = generate_simulated_data()
+    time.sleep(0.5)  # Petit délai pour l'effet de chargement
 
 if data is not None:
     # Calcul des indicateurs
     data = calculate_indicators(data)
     
-    # Métriques principales en cartes stylisées
-    st.markdown("### 📊 Aperçu du Marché")
-    
+    # Métriques principales
     col1, col2, col3, col4 = st.columns(4)
     
     current_price = data['Close'].iloc[-1]
@@ -246,56 +240,41 @@ if data is not None:
     daily_change = (current_price - prev_price) / prev_price * 100
     
     with col1:
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-label">Prix Actuel</div>
-            <div class="metric-value">${current_price:.2f}</div>
-            <div class="metric-delta" style="color: {'#28a745' if daily_change >= 0 else '#dc3545'};">
-                {daily_change:+.2f}%
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+        delta_color = "normal" if daily_change >= 0 else "inverse"
+        st.metric(
+            "Prix Actuel",
+            f"${current_price:.2f}",
+            f"{daily_change:+.2f}%",
+            delta_color=delta_color
+        )
     
     with col2:
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-label">Plus Haut Année</div>
-            <div class="metric-value">${data['High'].max():.2f}</div>
-            <div class="metric-delta">Annuel</div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.metric(
+            "Plus Haut 52 sem",
+            f"${data['High'].tail(252).max():.2f}"
+        )
     
     with col3:
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-label">Volume</div>
-            <div class="metric-value">{data['Volume'].iloc[-1]/1e6:.1f}M</div>
-            <div class="metric-delta">Aujourd'hui</div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.metric(
+            "Volume",
+            f"{data['Volume'].iloc[-1]/1e6:.1f}M"
+        )
     
     with col4:
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-label">RSI (14)</div>
-            <div class="metric-value">{data['RSI'].iloc[-1]:.1f}</div>
-            <div class="metric-delta">
-                <span class="badge {'badge-primary' if data['RSI'].iloc[-1] > 70 else ''}">
-                    {'Surachat' if data['RSI'].iloc[-1] > 70 else 'Neutre' if data['RSI'].iloc[-1] > 30 else 'Survente'}
-                </span>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.metric(
+            "RSI (14)",
+            f"{data['RSI'].iloc[-1]:.1f}"
+        )
     
     # Génération des prédictions
-    predictions, upper, lower = generate_predictions(data, days_to_predict)
+    predictions, lower, upper = generate_predictions(data, days_to_predict)
     
-    # Graphique principal
-    st.markdown("### 📈 Analyse & Prédictions")
+    # Graphique
+    st.markdown("## 📈 Analyse et Prédictions")
     
     fig = go.Figure()
     
-    # Prix historiques
+    # Prix historiques (6 mois)
     fig.add_trace(go.Scatter(
         x=data.index[-180:],
         y=data['Close'][-180:],
@@ -305,18 +284,31 @@ if data is not None:
         hovertemplate='Date: %{x}<br>Prix: $%{y:.2f}<extra></extra>'
     ))
     
-    # Moyenne mobile 50
-    fig.add_trace(go.Scatter(
-        x=data.index[-180:],
-        y=data['MA50'][-180:],
-        mode='lines',
-        name='MA50',
-        line=dict(color='orange', width=1, dash='dash'),
-        hovertemplate='MA50: $%{y:.2f}<extra></extra>'
-    ))
+    # Moyennes mobiles
+    if show_indicators:
+        fig.add_trace(go.Scatter(
+            x=data.index[-180:],
+            y=data['MA50'][-180:],
+            mode='lines',
+            name='MA50',
+            line=dict(color='orange', width=1, dash='dash'),
+            hovertemplate='MA50: $%{y:.2f}<extra></extra>'
+        ))
+        
+        fig.add_trace(go.Scatter(
+            x=data.index[-180:],
+            y=data['MA200'][-180:],
+            mode='lines',
+            name='MA200',
+            line=dict(color='red', width=1, dash='dash'),
+            hovertemplate='MA200: $%{y:.2f}<extra></extra>'
+        ))
     
     # Prédictions
-    future_dates = pd.date_range(start=data.index[-1] + timedelta(days=1), periods=days_to_predict)
+    future_dates = pd.date_range(
+        start=data.index[-1] + timedelta(days=1), 
+        periods=days_to_predict
+    )
     
     fig.add_trace(go.Scatter(
         x=future_dates,
@@ -324,7 +316,7 @@ if data is not None:
         mode='lines+markers',
         name='Prédiction',
         line=dict(color='#ff4b4b', width=3),
-        marker=dict(size=6, symbol='circle'),
+        marker=dict(size=6),
         hovertemplate='Date: %{x}<br>Prédiction: $%{y:.2f}<extra></extra>'
     ))
     
@@ -345,18 +337,18 @@ if data is not None:
         fill='tonexty',
         fillcolor='rgba(255,75,75,0.2)',
         line=dict(width=0),
-        name=f'Intervalle {confidence_level}%',
+        name='Intervalle 95%',
         hoverinfo='none'
     ))
     
     fig.update_layout(
         title={
-            'text': f"Prédiction Apple sur {days_to_predict} jours",
+            'text': f"Prédiction sur {days_to_predict} jours avec intervalle de confiance 95%",
             'y':0.95,
             'x':0.5,
             'xanchor': 'center',
             'yanchor': 'top',
-            'font': dict(size=20, family="Arial, sans-serif")
+            'font': dict(size=20)
         },
         xaxis_title="Date",
         yaxis_title="Prix ($)",
@@ -369,33 +361,38 @@ if data is not None:
             xanchor="left",
             x=0.01,
             bgcolor="rgba(255,255,255,0.8)"
-        ),
-        margin=dict(l=50, r=50, t=80, b=50)
+        )
     )
     
     st.plotly_chart(fig, use_container_width=True)
     
     # Tableau des prédictions
-    st.markdown("### 📅 Prédictions Détaillées")
+    st.markdown("## 📅 Détail des prédictions")
     
     pred_df = pd.DataFrame({
         'Date': future_dates.strftime('%d/%m/%Y'),
-        'Prix Prévu': [f"${p:.2f}" for p in predictions],
-        'Min ({confidence_level}%)'.format(confidence_level=confidence_level): [f"${l:.2f}" for l in lower],
-        'Max ({confidence_level}%)'.format(confidence_level=confidence_level): [f"${u:.2f}" for u in upper],
-        'Variation': [f"{(p/current_price-1)*100:+.1f}%" for p in predictions]
+        'Prix Prévu': predictions,
+        'Min (95%)': lower,
+        'Max (95%)': upper,
+        'Variation': ((predictions / current_price - 1) * 100)
     })
+    
+    # Formatage
+    pred_df['Prix Prévu'] = pred_df['Prix Prévu'].apply(lambda x: f"${x:.2f}")
+    pred_df['Min (95%)'] = pred_df['Min (95%)'].apply(lambda x: f"${x:.2f}")
+    pred_df['Max (95%)'] = pred_df['Max (95%)'].apply(lambda x: f"${x:.2f}")
+    pred_df['Variation'] = pred_df['Variation'].apply(lambda x: f"{x:+.1f}%")
     
     st.dataframe(
         pred_df,
         use_container_width=True,
         hide_index=True,
         column_config={
-            "Date": st.column_config.TextColumn("Date", width="small"),
-            "Prix Prévu": st.column_config.TextColumn("Prix Prévu", width="medium"),
-            f"Min ({confidence_level}%)": st.column_config.TextColumn("Min", width="medium"),
-            f"Max ({confidence_level}%)": st.column_config.TextColumn("Max", width="medium"),
-            "Variation": st.column_config.TextColumn("Variation", width="small")
+            "Date": "Date",
+            "Prix Prévu": "Prix Prévu",
+            "Min (95%)": "Min",
+            "Max (95%)": "Max",
+            "Variation": "Variation"
         }
     )
     
@@ -412,25 +409,27 @@ if data is not None:
         )
     
     with col2:
-        if st.button("🔄 Actualiser", use_container_width=True):
+        if st.button("🔄 Nouvelle simulation", use_container_width=True):
             st.cache_data.clear()
             st.rerun()
     
     with col3:
-        st.markdown(f"""
-        <div style='text-align: center; padding: 10px; background: #e9ecef; border-radius: 8px;'>
-            <small>Dernière mise à jour: {datetime.now().strftime('%H:%M:%S')}</small>
-        </div>
-        """, unsafe_allow_html=True)
+        st.info(f"Simulation: {datetime.now().strftime('%H:%M:%S')}")
+    
+    # Message d'info sur le mode simulation
+    st.info("""
+    ℹ️ **Mode simulation activé** - Les données sont générées localement pour éviter les limitations de l'API Yahoo Finance.
+    Les prix sont réalistes (autour de $175) mais ne reflètent pas les données en temps réel.
+    """)
 
 else:
-    st.error("❌ Impossible de charger les données. Vérifiez votre connexion internet.")
+    st.error("Erreur de génération des données")
 
 # Footer
 st.markdown("---")
 st.markdown("""
-<div style='text-align: center; color: #6c757d; padding: 20px;'>
-    <p>© 2024 Apple Stock Predictor Pro - Données fournies par Yahoo Finance</p>
+<div class="footer">
+    <p>© 2024 Apple Stock Predictor • Mode simulation</p>
     <p style='font-size: 0.8rem;'>⚠️ Les prédictions sont à but éducatif uniquement</p>
 </div>
 """, unsafe_allow_html=True)
