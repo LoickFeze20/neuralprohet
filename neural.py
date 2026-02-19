@@ -6,7 +6,6 @@ import plotly.express as px
 import yfinance as yf
 from datetime import datetime, timedelta
 import torch
-import neuralprophet
 import os
 
 # Chargement du modèle
@@ -598,6 +597,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
