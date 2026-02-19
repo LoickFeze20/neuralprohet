@@ -3,17 +3,27 @@ import types
 import os
 
 # 1. CRÉER UN FAUX MODULE pytorch_lightning COMPLET
-pl = types.ModuleType('pytorch_lightning')
+pytorch_lightning = types.ModuleType('pytorch_lightning')
 
 # Créer la classe LightningModule
 class LightningModule:
     def __init__(self):
         pass
 
-# Ajouter au module
-pl.LightningModule = LightningModule
-sys.modules['pytorch_lightning'] = pl
-sys.modules['pl'] = pl  # Pour les imports "import pl as"
+# Créer le sous-module loggers
+loggers = types.ModuleType('pytorch_lightning.loggers')
+class TensorBoardLogger:
+    def __init__(self, *args, **kwargs):
+        pass
+loggers.TensorBoardLogger = TensorBoardLogger
+
+# Ajouter loggers à pytorch_lightning
+pytorch_lightning.loggers = loggers
+pytorch_lightning.LightningModule = LightningModule
+
+# Injecter dans sys.modules
+sys.modules['pytorch_lightning'] = pytorch_lightning
+sys.modules['pytorch_lightning.loggers'] = loggers
 
 # 2. BLOQUER holidays
 holidays = types.ModuleType('holidays')
@@ -58,10 +68,9 @@ import torch
 import neuralprophet
 
 print("✅ NeuralProphet importé!")
-print(f"✅ pytorch_lightning.LightningModule: {pl.LightningModule}")
+print(f"✅ TensorBoardLogger: {pytorch_lightning.loggers.TensorBoardLogger}")
 
 # Suite de ton code...
-
 # Chargement du modèle
 @st.cache_resource
 def load_model():
@@ -651,6 +660,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
