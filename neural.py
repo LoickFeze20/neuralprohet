@@ -8,19 +8,23 @@ from datetime import datetime, timedelta
 import torch
 import os
 import sys
+
+# SOLUTION FINALE - Créer un module pkg_resources complet
 from types import ModuleType
+pkg_resources = ModuleType('pkg_resources')
 
-# Créer un faux module pkg_resources plus complet
-fake_pkg_resources = ModuleType('pkg_resources')
-
-# Ajouter les classes et fonctions nécessaires
+# Créer les classes nécessaires
 class DistributionNotFound(Exception):
     pass
 
 class VersionConflict(Exception):
     pass
 
-def get_distribution(name):
+class UnknownExtra(Exception):
+    pass
+
+# Ajouter les fonctions nécessaires
+def get_distribution(dist):
     return None
 
 def declare_namespace(name):
@@ -29,16 +33,59 @@ def declare_namespace(name):
 def require(*args, **kwargs):
     return []
 
-# Ajouter au module
-fake_pkg_resources.DistributionNotFound = DistributionNotFound
-fake_pkg_resources.VersionConflict = VersionConflict
-fake_pkg_resources.get_distribution = get_distribution
-fake_pkg_resources.declare_namespace = declare_namespace
-fake_pkg_resources.require = require
-fake_pkg_resources.__version__ = '0.0.0'
+def resource_filename(package, resource):
+    return ''
+
+def resource_string(package, resource):
+    return b''
+
+def resource_stream(package, resource):
+    return None
+
+def resource_isdir(package, resource):
+    return False
+
+def resource_listdir(package, resource):
+    return []
+
+def cleanup_resources():
+    pass
+
+# Ajouter tout au module
+pkg_resources.DistributionNotFound = DistributionNotFound
+pkg_resources.VersionConflict = VersionConflict
+pkg_resources.UnknownExtra = UnknownExtra
+pkg_resources.get_distribution = get_distribution
+pkg_resources.declare_namespace = declare_namespace
+pkg_resources.require = require
+pkg_resources.resource_filename = resource_filename
+pkg_resources.resource_string = resource_string
+pkg_resources.resource_stream = resource_stream
+pkg_resources.resource_isdir = resource_isdir
+pkg_resources.resource_listdir = resource_listdir
+pkg_resources.cleanup_resources = cleanup_resources
+pkg_resources.__version__ = '0.0.0'
 
 # Injecter dans sys.modules
-sys.modules['pkg_resources'] = fake_pkg_resources
+sys.modules['pkg_resources'] = pkg_resources
+
+# IMPORTANT: Maintenant on peut charger le modèle
+@st.cache_resource
+def load_model():
+    try:
+        if os.path.exists("apple_neural.pt"):
+            st.sidebar.write("✅ Fichier trouvé, chargement...")
+            model = torch.load("apple_neural.pt", map_location='cpu', weights_only=False)
+            st.sidebar.write("✅ Modèle chargé avec succès!")
+            return model
+        else:
+            st.sidebar.error("❌ Fichier non trouvé")
+            return None
+    except Exception as e:
+        st.sidebar.error(f"Erreur: {e}")
+        return None
+
+model = load_model()
 
 # Suite du code...
 
@@ -613,6 +660,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
