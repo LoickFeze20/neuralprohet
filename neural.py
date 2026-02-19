@@ -194,7 +194,7 @@ with st.sidebar:
     <div style='text-align: center; margin: 20px 0;'>
         <a href="https://lstm-1.streamlit.app" target="_blank">
             <button class="nav-button">
-                🚀 ANALYSE AVANCÉE
+                🚀 LSTM
             </button>
         </a>
         <p style='font-size: 0.8rem; color: #6c757d; margin-top: 5px;'>
@@ -433,3 +433,4 @@ st.markdown("""
     <p style='font-size: 0.8rem;'>⚠️ Les prédictions sont à but éducatif uniquement</p>
 </div>
 """, unsafe_allow_html=True)
+
