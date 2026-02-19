@@ -69,14 +69,17 @@ pkg_resources.__version__ = '0.0.0'
 # Injecter dans sys.modules
 sys.modules['pkg_resources'] = pkg_resources
 
-# IMPORTANT: Maintenant on peut charger le modèle
+# DÉBUT DU FICHIER - APRÈS LES IMPORTS ET LE PATCH
+
 @st.cache_resource
 def load_model():
     try:
         if os.path.exists("apple_neural.pt"):
             st.sidebar.write("✅ Fichier trouvé, chargement...")
-            model = torch.load("apple_neural.pt", map_location='cpu', weights_only=False)
-            st.sidebar.write("✅ Modèle chargé avec succès!")
+            import pickle
+            with open("apple_neural.pt", 'rb') as f:
+                model = pickle.load(f)
+            st.sidebar.write("✅ Modèle chargé!")
             return model
         else:
             st.sidebar.error("❌ Fichier non trouvé")
@@ -85,7 +88,7 @@ def load_model():
         st.sidebar.error(f"Erreur: {e}")
         return None
 
-model = load_model()
+# PAS D'APPEL ICI, juste la définition
 
 # Suite du code...
 
@@ -256,26 +259,6 @@ with st.sidebar:
     
     # Chargement du modèle
     @st.cache_resource
-    def load_model():
-        try:
-            import torch
-            import os
-            
-            if os.path.exists("apple_neural.pt"):
-                st.sidebar.write("✅ Fichier trouvé")
-                
-                # Charger avec torch
-                model = torch.load("apple_neural.pt", map_location='cpu', weights_only=False)
-                
-                st.sidebar.write("✅ Modèle chargé")
-                return model
-            else:
-                st.sidebar.error("❌ Fichier non trouvé")
-                return None
-        except Exception as e:
-            st.sidebar.error(f"Erreur: {e}")
-            return None
-    
     model = load_model()
     
     if model:
@@ -660,6 +643,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
