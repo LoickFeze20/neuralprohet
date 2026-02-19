@@ -2,7 +2,20 @@ import sys
 import types
 import os
 
-# 1. BLOQUER holidays COMPLÈTEMENT
+# 1. CRÉER UN FAUX MODULE pytorch_lightning COMPLET
+pl = types.ModuleType('pytorch_lightning')
+
+# Créer la classe LightningModule
+class LightningModule:
+    def __init__(self):
+        pass
+
+# Ajouter au module
+pl.LightningModule = LightningModule
+sys.modules['pytorch_lightning'] = pl
+sys.modules['pl'] = pl  # Pour les imports "import pl as"
+
+# 2. BLOQUER holidays
 holidays = types.ModuleType('holidays')
 holidays.WEEKEND = []
 holidays.HolidayBase = object
@@ -16,31 +29,22 @@ holidays.UnitedKingdom = object
 holidays.UnitedStates = object
 sys.modules['holidays'] = holidays
 
-# 2. Créer un faux pkg_resources
+# 3. Créer un faux pkg_resources
 pkg_resources = types.ModuleType('pkg_resources')
-
-class DistributionNotFound(Exception):
-    pass
-
+class DistributionNotFound(Exception): pass
 def get_distribution(name):
     dist = types.ModuleType('distribution')
     dist.version = '0.0.0'
     return dist
-
 pkg_resources.DistributionNotFound = DistributionNotFound
 pkg_resources.get_distribution = get_distribution
 pkg_resources.__version__ = '0.0.0'
 sys.modules['pkg_resources'] = pkg_resources
 
-# 3. BLOQUER lightning_fabric
+# 4. BLOQUER lightning_fabric
 sys.modules['lightning_fabric'] = types.ModuleType('lightning_fabric')
 sys.modules['lightning_fabric.utilities'] = types.ModuleType('lightning_fabric.utilities')
 sys.modules['lightning_fabric.utilities.imports'] = types.ModuleType('lightning_fabric.utilities.imports')
-
-# 4. BLOQUER pytorch_lightning
-sys.modules['pytorch_lightning'] = types.ModuleType('pytorch_lightning')
-sys.modules['pytorch_lightning.utilities'] = types.ModuleType('pytorch_lightning.utilities')
-sys.modules['pytorch_lightning.utilities.imports'] = types.ModuleType('pytorch_lightning.utilities.imports')
 
 # 5. Imports normaux
 import streamlit as st
@@ -54,7 +58,7 @@ import torch
 import neuralprophet
 
 print("✅ NeuralProphet importé!")
-print(f"✅ Type de holidays: {type(sys.modules['holidays'])}")
+print(f"✅ pytorch_lightning.LightningModule: {pl.LightningModule}")
 
 # Suite de ton code...
 
@@ -647,6 +651,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
