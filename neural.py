@@ -7,14 +7,37 @@ import yfinance as yf
 from datetime import datetime, timedelta
 import torch
 import os
-
-# PATCH POUR PKG_RESOURCES (ajoute ça)
 import sys
 from types import ModuleType
+
+# Créer un faux module pkg_resources plus complet
 fake_pkg_resources = ModuleType('pkg_resources')
-def fake_declare_namespace(name):
+
+# Ajouter les classes et fonctions nécessaires
+class DistributionNotFound(Exception):
     pass
-fake_pkg_resources.declare_namespace = fake_declare_namespace
+
+class VersionConflict(Exception):
+    pass
+
+def get_distribution(name):
+    return None
+
+def declare_namespace(name):
+    pass
+
+def require(*args, **kwargs):
+    return []
+
+# Ajouter au module
+fake_pkg_resources.DistributionNotFound = DistributionNotFound
+fake_pkg_resources.VersionConflict = VersionConflict
+fake_pkg_resources.get_distribution = get_distribution
+fake_pkg_resources.declare_namespace = declare_namespace
+fake_pkg_resources.require = require
+fake_pkg_resources.__version__ = '0.0.0'
+
+# Injecter dans sys.modules
 sys.modules['pkg_resources'] = fake_pkg_resources
 
 # Suite du code...
@@ -590,6 +613,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
