@@ -1,6 +1,5 @@
-# requirements.txt pour NeuralProphet 0.6.2 sur Streamlit Cloud
-python-dateutil==2.8.2
-numpy==1.23.6
+# requirements.txt compatible NeuralProphet 0.6.2 et Python 3.10
+numpy==1.23.5
 pandas==1.5.3
 matplotlib==3.7.1
 torch==1.13.1
@@ -10,4 +9,5 @@ plotly==5.15.0
 streamlit==1.52.1
 holidays==0.21.13
 captum==0.6.0
+python-dateutil==2.8.2
 typing-extensions==4.5.0
