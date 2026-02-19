@@ -3,7 +3,5 @@ pandas
 numpy
 plotly
 yfinance
-neuralprophet==0.5.0
-torch==1.12.1
-pytorch-lightning==1.7.7
-setuptools==65.6.3
+neuralprophet
+torch
