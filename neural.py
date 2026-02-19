@@ -4,21 +4,12 @@ import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
 import yfinance as yf
+from neuralprophet import NeuralProphet
 from datetime import datetime, timedelta
 import torch
 import os
-import sys
-import subprocess
 
-# SOLUTION RADICALE - RÉINSTALLER SETUPTOOLS
-subprocess.check_call([sys.executable, "-m", "pip", "uninstall", "-y", "setuptools"])
-subprocess.check_call([sys.executable, "-m", "pip", "install", "setuptools==69.0.0"])
-
-# Forcer l'import
-import pkg_resources
-
-# MAINTENANT IMPORTER NEURALPROPHET
-from neuralprophet import NeuralProphet
+# Plus rien d'autre, pas de code de réinstallation
 
 # Configuration de la page
 st.set_page_config(
@@ -545,4 +536,5 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
