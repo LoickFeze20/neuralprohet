@@ -262,11 +262,12 @@ with st.sidebar:
     def load_model():
         try:
             if os.path.exists("apple_neural.pt"):
-                st.sidebar.write("✅ Fichier trouvé, chargement...")
-                import pickle
-                with open("apple_neural.pt", 'rb') as f:
-                    model = pickle.load(f)
-                st.sidebar.write("✅ Modèle chargé!")
+                st.sidebar.write("✅ Fichier trouvé, chargement avec PyTorch...")
+                
+                # CHARGEMENT AVEC TORCH (pas pickle)
+                model = torch.load("apple_neural.pt", map_location='cpu', weights_only=False)
+                
+                st.sidebar.write("✅ Modèle chargé avec PyTorch!")
                 return model
             else:
                 st.sidebar.error("❌ Fichier non trouvé")
@@ -275,7 +276,7 @@ with st.sidebar:
             st.sidebar.error(f"Erreur: {e}")
             return None
     
-    # Appel du modèle (BIEN INDENTÉ, au même niveau que la fonction)
+    # Appel du modèle
     model = load_model()
     
     if model:
@@ -659,6 +660,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
