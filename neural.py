@@ -164,33 +164,18 @@ with st.sidebar:
         """, unsafe_allow_html=True)
     
     # Chargement du modèle
-    # Chargement du modèle
     @st.cache_resource
     def load_model():
         try:
-            # Vérifier le chemin
-            import os
-            current_dir = os.getcwd()
-            files = os.listdir(current_dir)
-            
-            st.sidebar.write(f"📁 Dossier courant: {current_dir}")
-            st.sidebar.write(f"📄 Fichiers trouvés: {files[:5]}...")
-            
-            if "apple_neural.pt" in files:
-                st.sidebar.success("✅ Fichier trouvé!")
-                
-                # Chargement SIMPLE
+            if os.path.exists("apple_neural.pt"):
                 model = torch.load("apple_neural.pt", map_location='cpu', weights_only=False)
-                
                 return model
             else:
-                st.sidebar.error("❌ Fichier absent")
                 return None
         except Exception as e:
             st.sidebar.error(f"Erreur: {e}")
             return None
     
-    # Charger le modèle (APPEL DE LA FONCTION)
     model = load_model()
     
     # Vérification du modèle (HORS de la fonction)
@@ -576,6 +561,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
