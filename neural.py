@@ -1,10 +1,23 @@
 import sys
 import os
 
-# BLOQUER LIGHTNING_FABRIC COMPLÈTEMENT
-sys.modules['lightning_fabric'] = None
+# Créer un faux module lightning_fabric
+import types
+lightning_fabric = types.ModuleType('lightning_fabric')
+lightning_fabric.utilities = types.ModuleType('lightning_fabric.utilities')
+lightning_fabric.utilities.imports = types.ModuleType('lightning_fabric.utilities.imports')
 
-# Ensuite tes imports normaux
+def fake_import(name, *args, **kwargs):
+    return None
+
+lightning_fabric.utilities.imports._compare_version = lambda *args: False
+lightning_fabric.utilities.imports._TORCHTEXT_LEGACY = False
+
+sys.modules['lightning_fabric'] = lightning_fabric
+sys.modules['lightning_fabric.utilities'] = lightning_fabric.utilities
+sys.modules['lightning_fabric.utilities.imports'] = lightning_fabric.utilities.imports
+
+# Maintenant tes imports normaux
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -607,6 +620,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
