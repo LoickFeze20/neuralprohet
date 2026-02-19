@@ -7,15 +7,15 @@ import yfinance as yf
 from datetime import datetime, timedelta
 import torch
 import os
-import subprocess
 import sys
+import subprocess
 
-# FORCER L'INSTALLATION DE SETUPTOOLS AU DÉMARRAGE
-try:
-    import pkg_resources
-except ImportError:
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "setuptools"])
-    import pkg_resources
+# SOLUTION RADICALE - RÉINSTALLER SETUPTOOLS
+subprocess.check_call([sys.executable, "-m", "pip", "uninstall", "-y", "setuptools"])
+subprocess.check_call([sys.executable, "-m", "pip", "install", "setuptools==69.0.0"])
+
+# Forcer l'import
+import pkg_resources
 
 # MAINTENANT IMPORTER NEURALPROPHET
 from neuralprophet import NeuralProphet
@@ -545,3 +545,4 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
