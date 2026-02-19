@@ -5,3 +5,4 @@ plotly
 yfinance
 torch
 neuralprophet
+setuptools==69.0.0 
