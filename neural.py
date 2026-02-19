@@ -164,6 +164,7 @@ with st.sidebar:
         """, unsafe_allow_html=True)
     
     # Chargement du modèle
+    # Chargement du modèle
     @st.cache_resource
     def load_model():
         try:
@@ -173,11 +174,16 @@ with st.sidebar:
             files = os.listdir(current_dir)
             
             st.sidebar.write(f"📁 Dossier courant: {current_dir}")
-            st.sidebar.write(f"📄 Fichiers trouvés: {files[:5]}...")  # Montre les 5 premiers fichiers
+            st.sidebar.write(f"📄 Fichiers trouvés: {files[:5]}...")
             
             if "apple_neural.pt" in files:
                 st.sidebar.success("✅ Fichier trouvé!")
-                model = torch.load("apple_neural.pt", map_location='cpu', weights_only=False)
+                
+                # Méthode alternative de chargement
+                import pickle
+                with open("apple_neural.pt", 'rb') as f:
+                    model = pickle.load(f)
+                
                 return model
             else:
                 st.sidebar.error("❌ Fichier apple_neural.pt absent de la liste")
@@ -185,8 +191,6 @@ with st.sidebar:
         except Exception as e:
             st.sidebar.error(f"Erreur: {e}")
             return None
-    
-    model = load_model()
     
     if model:
         st.success("✅ Modèle chargé")
@@ -570,5 +574,6 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
