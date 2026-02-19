@@ -1,3 +1,10 @@
+import sys
+import os
+
+# BLOQUER LIGHTNING_FABRIC COMPLÈTEMENT
+sys.modules['lightning_fabric'] = None
+
+# Ensuite tes imports normaux
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -6,68 +13,8 @@ import plotly.express as px
 import yfinance as yf
 from datetime import datetime, timedelta
 import torch
-import os
-import sys
 
-# SOLUTION FINALE - Créer un module pkg_resources complet
-from types import ModuleType
-pkg_resources = ModuleType('pkg_resources')
-
-# Créer les classes nécessaires
-class DistributionNotFound(Exception):
-    pass
-
-class VersionConflict(Exception):
-    pass
-
-class UnknownExtra(Exception):
-    pass
-
-# Ajouter les fonctions nécessaires
-def get_distribution(dist):
-    return None
-
-def declare_namespace(name):
-    pass
-
-def require(*args, **kwargs):
-    return []
-
-def resource_filename(package, resource):
-    return ''
-
-def resource_string(package, resource):
-    return b''
-
-def resource_stream(package, resource):
-    return None
-
-def resource_isdir(package, resource):
-    return False
-
-def resource_listdir(package, resource):
-    return []
-
-def cleanup_resources():
-    pass
-
-# Ajouter tout au module
-pkg_resources.DistributionNotFound = DistributionNotFound
-pkg_resources.VersionConflict = VersionConflict
-pkg_resources.UnknownExtra = UnknownExtra
-pkg_resources.get_distribution = get_distribution
-pkg_resources.declare_namespace = declare_namespace
-pkg_resources.require = require
-pkg_resources.resource_filename = resource_filename
-pkg_resources.resource_string = resource_string
-pkg_resources.resource_stream = resource_stream
-pkg_resources.resource_isdir = resource_isdir
-pkg_resources.resource_listdir = resource_listdir
-pkg_resources.cleanup_resources = cleanup_resources
-pkg_resources.__version__ = '0.0.0'
-
-# Injecter dans sys.modules
-sys.modules['pkg_resources'] = pkg_resources
+# Supprime TOUT le code de patch pkg_resources
 
 # DÉBUT DU FICHIER - APRÈS LES IMPORTS ET LE PATCH
 
@@ -660,6 +607,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
