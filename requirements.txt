@@ -1,18 +1,7 @@
-# Gestion de l'installation
-pip==24.0
-setuptools==68.2.2
-wheel==0.41.2
-
-# Packages de données
-numpy==1.23.5
-pandas==1.5.3
-matplotlib==3.7.1
-
-# Torch et NeuralProphet
-torch==1.13.1
-neuralprophet==0.6.2
-
-# Streamlit et visualisation
-streamlit==1.52.1
+streamlit
+pandas
+numpy
 plotly
 yfinance
+neuralprophet
+torch
