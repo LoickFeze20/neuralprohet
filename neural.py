@@ -2,29 +2,36 @@ import sys
 import types
 import os
 
-# Créer un faux module pkg_resources COMPLET pour torchmetrics
+# 1. BLOQUER holidays
+sys.modules['holidays'] = types.ModuleType('holidays')
+
+# 2. Créer un faux pkg_resources
 pkg_resources = types.ModuleType('pkg_resources')
 
-# Créer les classes nécessaires
 class DistributionNotFound(Exception):
     pass
 
-# Fonction get_distribution
 def get_distribution(name):
-    # Retourner un faux objet distribution
     dist = types.ModuleType('distribution')
     dist.version = '0.0.0'
     return dist
 
-# Ajouter au module
 pkg_resources.DistributionNotFound = DistributionNotFound
 pkg_resources.get_distribution = get_distribution
 pkg_resources.__version__ = '0.0.0'
-
-# Injecter dans sys.modules AVANT les imports
 sys.modules['pkg_resources'] = pkg_resources
 
-# MAINTENANT tes imports
+# 3. BLOQUER lightning_fabric
+sys.modules['lightning_fabric'] = types.ModuleType('lightning_fabric')
+sys.modules['lightning_fabric.utilities'] = types.ModuleType('lightning_fabric.utilities')
+sys.modules['lightning_fabric.utilities.imports'] = types.ModuleType('lightning_fabric.utilities.imports')
+
+# 4. BLOQUER pytorch_lightning
+sys.modules['pytorch_lightning'] = types.ModuleType('pytorch_lightning')
+sys.modules['pytorch_lightning.utilities'] = types.ModuleType('pytorch_lightning.utilities')
+sys.modules['pytorch_lightning.utilities.imports'] = types.ModuleType('pytorch_lightning.utilities.imports')
+
+# 5. Imports normaux
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -33,9 +40,9 @@ import plotly.express as px
 import yfinance as yf
 from datetime import datetime, timedelta
 import torch
-import neuralprophet
+import neuralprophet  # On croise les doigts !
 
-# Le reste de ton code...
+# Suite de ton code...
 
 # Chargement du modèle
 @st.cache_resource
@@ -626,6 +633,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
