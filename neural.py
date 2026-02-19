@@ -1,7 +1,3 @@
-import sys
-import types
-import os
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -11,6 +7,7 @@ import yfinance as yf
 from datetime import datetime, timedelta
 import torch
 import neuralprophet
+import os
 
 # Chargement du modèle
 @st.cache_resource
@@ -601,6 +598,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
