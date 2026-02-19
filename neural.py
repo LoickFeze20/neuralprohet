@@ -1,3 +1,9 @@
+import subprocess
+import sys
+
+# Forcer l'installation de setuptools
+subprocess.check_call([sys.executable, "-m", "pip", "install", "setuptools==69.0.0"])
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -238,3 +244,4 @@ st.markdown("""
     <p>🍎 Entraînement NeuralProphet en direct - Pas de modèle pré-entraîné nécessaire</p>
 </div>
 """, unsafe_allow_html=True)
+
