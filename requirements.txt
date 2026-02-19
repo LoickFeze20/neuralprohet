@@ -10,3 +10,4 @@ torch==1.13.1
 neuralprophet==0.6.2
 
 streamlit==1.52.1
+yfinance==0.2.37
