@@ -8,7 +8,16 @@ from datetime import datetime, timedelta
 import torch
 import os
 
-# PAS DE CODE DE RÉINSTALLATION
+# PATCH POUR PKG_RESOURCES (ajoute ça)
+import sys
+from types import ModuleType
+fake_pkg_resources = ModuleType('pkg_resources')
+def fake_declare_namespace(name):
+    pass
+fake_pkg_resources.declare_namespace = fake_declare_namespace
+sys.modules['pkg_resources'] = fake_pkg_resources
+
+# Suite du code...
 
 # Configuration de la page
 st.set_page_config(
@@ -164,25 +173,34 @@ with st.sidebar:
         </a>
         """, unsafe_allow_html=True)
     
-        # Chargement du modèle avec pickle
-        # Chargement du modèle avec torch
+        # Patch pour pkg_resources
+    import sys
+    from types import ModuleType
+    
+    # Créer un faux module pkg_resources
+    fake_pkg_resources = ModuleType('pkg_resources')
+    def fake_declare_namespace(name):
+        pass
+    fake_pkg_resources.declare_namespace = fake_declare_namespace
+    sys.modules['pkg_resources'] = fake_pkg_resources
+    
+    # Chargement du modèle
     @st.cache_resource
     def load_model():
         try:
             import torch
             import os
             
-            # Vérifier si le fichier existe
             if os.path.exists("apple_neural.pt"):
-                st.sidebar.write("✅ Fichier trouvé, tentative de chargement avec torch...")
+                st.sidebar.write("✅ Fichier trouvé")
                 
                 # Charger avec torch
                 model = torch.load("apple_neural.pt", map_location='cpu', weights_only=False)
                 
-                st.sidebar.write("✅ Modèle chargé avec torch")
+                st.sidebar.write("✅ Modèle chargé")
                 return model
             else:
-                st.sidebar.error("❌ Fichier apple_neural.pt non trouvé")
+                st.sidebar.error("❌ Fichier non trouvé")
                 return None
         except Exception as e:
             st.sidebar.error(f"Erreur: {e}")
@@ -572,6 +590,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
