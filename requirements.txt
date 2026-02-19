@@ -1,8 +1,10 @@
 streamlit==1.28.0
 pandas==2.0.3
-numpy>=1.25.0,<2.0.0
+numpy==1.24.3
 plotly==5.17.0
 yfinance==0.2.28
-neuralprophet==0.8.0
+neuralprophet==0.7.0  # ← Changé de 0.8.0 à 0.7.0
 torch==2.0.1
 setuptools==69.0.0
+lightning==2.0.0       # ← Ajouté
+pytorch-lightning==2.0.0  # ← Ajouté
