@@ -2,28 +2,27 @@ import sys
 import types
 import os
 
-# BLOQUER pytorch_lightning COMPLÈTEMENT
-sys.modules['pytorch_lightning'] = types.ModuleType('pytorch_lightning')
-sys.modules['pytorch_lightning.utilities'] = types.ModuleType('pytorch_lightning.utilities')
-sys.modules['pytorch_lightning.utilities.imports'] = types.ModuleType('pytorch_lightning.utilities.imports')
+# Créer un faux module pkg_resources COMPLET pour torchmetrics
+pkg_resources = types.ModuleType('pkg_resources')
 
-# Créer les fonctions nécessaires
-def fake_import(name, *args, **kwargs):
-    return None
+# Créer les classes nécessaires
+class DistributionNotFound(Exception):
+    pass
 
-# Ajouter ce que pytorch_lightning attend
-pytorch_lightning_imports = sys.modules['pytorch_lightning.utilities.imports']
-pytorch_lightning_imports._compare_version = lambda *args: False
-pytorch_lightning_imports._TORCHTEXT_LEGACY = False
-pytorch_lightning_imports._TOPICAL = False
+# Fonction get_distribution
+def get_distribution(name):
+    # Retourner un faux objet distribution
+    dist = types.ModuleType('distribution')
+    dist.version = '0.0.0'
+    return dist
 
-# BLOQUER AUSSI lightning_fabric
-sys.modules['lightning_fabric'] = types.ModuleType('lightning_fabric')
-sys.modules['lightning_fabric.utilities'] = types.ModuleType('lightning_fabric.utilities')
-sys.modules['lightning_fabric.utilities.imports'] = types.ModuleType('lightning_fabric.utilities.imports')
+# Ajouter au module
+pkg_resources.DistributionNotFound = DistributionNotFound
+pkg_resources.get_distribution = get_distribution
+pkg_resources.__version__ = '0.0.0'
 
-# BLOQUER pkg_resources (même si on l'utilise plus)
-sys.modules['pkg_resources'] = types.ModuleType('pkg_resources')
+# Injecter dans sys.modules AVANT les imports
+sys.modules['pkg_resources'] = pkg_resources
 
 # MAINTENANT tes imports
 import streamlit as st
@@ -34,7 +33,9 @@ import plotly.express as px
 import yfinance as yf
 from datetime import datetime, timedelta
 import torch
-import neuralprophet  # ÇA DEVRAIT MARCHER MAINTENANT !
+import neuralprophet
+
+# Le reste de ton code...
 
 # Chargement du modèle
 @st.cache_resource
@@ -625,6 +626,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
