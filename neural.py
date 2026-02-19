@@ -8,15 +8,9 @@ from neuralprophet import NeuralProphet
 from datetime import datetime, timedelta
 import torch
 import os
-import sys
 
-# Forcer l'import de pkg_resources si nécessaire
-try:
-    import pkg_resources
-except ImportError:
-    import subprocess
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "setuptools"])
-    import pkg_resources
+# PAS DE CODE SUPPLEMENTAIRE
+# PAS DE TRY/EXCEPT POUR PKG_RESOURCES
 # Configuration de la page
 st.set_page_config(
     page_title="Apple NeuralProphet Predictor",
@@ -569,6 +563,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
