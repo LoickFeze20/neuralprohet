@@ -7,10 +7,6 @@ import yfinance as yf
 from neuralprophet import NeuralProphet
 from datetime import datetime, timedelta
 import torch
-# Patch pour lightning_fabric
-import lightning_fabric
-from lightning_fabric.utilities.data import _AttributeDict
-lightning_fabric.utilities.data.AttributeDict = _AttributeDict
 import os
 
 # Configuration de la page
@@ -574,4 +570,5 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
