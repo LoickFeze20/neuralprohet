@@ -5,4 +5,4 @@ plotly
 yfinance
 neuralprophet
 torch
-setuptools  # ← AJOUTE CETTE LIGNE
+setuptools
