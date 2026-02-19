@@ -8,26 +8,6 @@ from datetime import datetime, timedelta
 import torch
 import os
 
-# Chargement du modèle
-@st.cache_resource
-def load_model():
-    try:
-        if os.path.exists("apple_neural.pt"):
-            st.sidebar.write("✅ Fichier trouvé, chargement...")
-            model = torch.load("apple_neural.pt", map_location='cpu', weights_only=False)
-            st.sidebar.write("✅ Modèle chargé!")
-            return model
-        else:
-            st.sidebar.error("❌ Fichier non trouvé")
-            return None
-    except Exception as e:
-        st.sidebar.error(f"Erreur: {e}")
-        return None
-
-model = load_model()
-
-# Suite de ton code...
-# Suite du code...
 
 # Configuration de la page
 st.set_page_config(
@@ -597,6 +577,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
