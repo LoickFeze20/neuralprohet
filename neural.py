@@ -2,72 +2,30 @@ import sys
 import types
 import os
 
-# Créer un faux module pkg_resources COMPLET
-pkg_resources = types.ModuleType('pkg_resources')
+# BLOQUER pytorch_lightning COMPLÈTEMENT
+sys.modules['pytorch_lightning'] = types.ModuleType('pytorch_lightning')
+sys.modules['pytorch_lightning.utilities'] = types.ModuleType('pytorch_lightning.utilities')
+sys.modules['pytorch_lightning.utilities.imports'] = types.ModuleType('pytorch_lightning.utilities.imports')
 
-# Ajouter toutes les classes et fonctions nécessaires
-class DistributionNotFound(Exception):
-    pass
-
-class VersionConflict(Exception):
-    pass
-
-class UnknownExtra(Exception):
-    pass
-
-def get_distribution(name):
+# Créer les fonctions nécessaires
+def fake_import(name, *args, **kwargs):
     return None
 
-def require(*args, **kwargs):
-    return []
+# Ajouter ce que pytorch_lightning attend
+pytorch_lightning_imports = sys.modules['pytorch_lightning.utilities.imports']
+pytorch_lightning_imports._compare_version = lambda *args: False
+pytorch_lightning_imports._TORCHTEXT_LEGACY = False
+pytorch_lightning_imports._TOPICAL = False
 
-def resource_filename(package, resource):
-    return ''
-
-def resource_string(package, resource):
-    return b''
-
-def resource_stream(package, resource):
-    return None
-
-def resource_isdir(package, resource):
-    return False
-
-def resource_listdir(package, resource):
-    return []
-
-def cleanup_resources():
-    pass
-
-def declare_namespace(name):
-    pass
-
-def working_set():
-    return []
-
-# Attacher tout au module
-pkg_resources.DistributionNotFound = DistributionNotFound
-pkg_resources.VersionConflict = VersionConflict
-pkg_resources.UnknownExtra = UnknownExtra
-pkg_resources.get_distribution = get_distribution
-pkg_resources.require = require
-pkg_resources.resource_filename = resource_filename
-pkg_resources.resource_string = resource_string
-pkg_resources.resource_stream = resource_stream
-pkg_resources.resource_isdir = resource_isdir
-pkg_resources.resource_listdir = resource_listdir
-pkg_resources.cleanup_resources = cleanup_resources
-pkg_resources.declare_namespace = declare_namespace
-pkg_resources.working_set = working_set
-pkg_resources.__version__ = '0.0.0'
-
-# Injecter dans sys.modules
-sys.modules['pkg_resources'] = pkg_resources
-
-# Bloquer lightning_fabric aussi
+# BLOQUER AUSSI lightning_fabric
 sys.modules['lightning_fabric'] = types.ModuleType('lightning_fabric')
+sys.modules['lightning_fabric.utilities'] = types.ModuleType('lightning_fabric.utilities')
+sys.modules['lightning_fabric.utilities.imports'] = types.ModuleType('lightning_fabric.utilities.imports')
 
-# MAINTENANT tes imports normaux
+# BLOQUER pkg_resources (même si on l'utilise plus)
+sys.modules['pkg_resources'] = types.ModuleType('pkg_resources')
+
+# MAINTENANT tes imports
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -76,19 +34,15 @@ import plotly.express as px
 import yfinance as yf
 from datetime import datetime, timedelta
 import torch
+import neuralprophet  # ÇA DEVRAIT MARCHER MAINTENANT !
 
-# Le reste de ton code...
-
-# DÉBUT DU FICHIER - APRÈS LES IMPORTS ET LE PATCH
-
+# Chargement du modèle
 @st.cache_resource
 def load_model():
     try:
         if os.path.exists("apple_neural.pt"):
             st.sidebar.write("✅ Fichier trouvé, chargement...")
-            import pickle
-            with open("apple_neural.pt", 'rb') as f:
-                model = pickle.load(f)
+            model = torch.load("apple_neural.pt", map_location='cpu', weights_only=False)
             st.sidebar.write("✅ Modèle chargé!")
             return model
         else:
@@ -98,8 +52,9 @@ def load_model():
         st.sidebar.error(f"Erreur: {e}")
         return None
 
-# PAS D'APPEL ICI, juste la définition
+model = load_model()
 
+# Suite de ton code...
 # Suite du code...
 
 # Configuration de la page
@@ -670,6 +625,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
