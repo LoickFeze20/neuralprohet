@@ -4,10 +4,21 @@ import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
 import yfinance as yf
-from neuralprophet import NeuralProphet
 from datetime import datetime, timedelta
 import torch
 import os
+import subprocess
+import sys
+
+# FORCER L'INSTALLATION DE SETUPTOOLS AU DÉMARRAGE
+try:
+    import pkg_resources
+except ImportError:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "setuptools"])
+    import pkg_resources
+
+# MAINTENANT IMPORTER NEURALPROPHET
+from neuralprophet import NeuralProphet
 
 # Configuration de la page
 st.set_page_config(
@@ -532,4 +543,5 @@ st.markdown("""
     <p>🍎 Apple NeuralProphet Predictor - Version Professionnelle</p>
     <p style='font-size: 0.8rem;'>© 2024 - Tous droits réservés</p>
 </div>
+
 """, unsafe_allow_html=True)
