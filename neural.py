@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 import torch
 import os
 
-# Plus rien d'autre, pas de code de réinstallation
+# PAS DE CODE DE RÉINSTALLATION
 
 # Configuration de la page
 st.set_page_config(
@@ -536,5 +536,6 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
