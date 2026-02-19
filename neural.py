@@ -2,61 +2,6 @@ import sys
 import types
 import os
 
-# 1. CRÉER UN FAUX MODULE pytorch_lightning COMPLET
-pytorch_lightning = types.ModuleType('pytorch_lightning')
-
-# Créer la classe LightningModule
-class LightningModule:
-    def __init__(self):
-        pass
-
-# Créer le sous-module loggers
-loggers = types.ModuleType('pytorch_lightning.loggers')
-class TensorBoardLogger:
-    def __init__(self, *args, **kwargs):
-        pass
-loggers.TensorBoardLogger = TensorBoardLogger
-
-# Ajouter loggers à pytorch_lightning
-pytorch_lightning.loggers = loggers
-pytorch_lightning.LightningModule = LightningModule
-
-# Injecter dans sys.modules
-sys.modules['pytorch_lightning'] = pytorch_lightning
-sys.modules['pytorch_lightning.loggers'] = loggers
-
-# 2. BLOQUER holidays
-holidays = types.ModuleType('holidays')
-holidays.WEEKEND = []
-holidays.HolidayBase = object
-holidays.Turkey = object
-holidays.Finland = object
-holidays.France = object
-holidays.Germany = object
-holidays.Italy = object
-holidays.Spain = object
-holidays.UnitedKingdom = object
-holidays.UnitedStates = object
-sys.modules['holidays'] = holidays
-
-# 3. Créer un faux pkg_resources
-pkg_resources = types.ModuleType('pkg_resources')
-class DistributionNotFound(Exception): pass
-def get_distribution(name):
-    dist = types.ModuleType('distribution')
-    dist.version = '0.0.0'
-    return dist
-pkg_resources.DistributionNotFound = DistributionNotFound
-pkg_resources.get_distribution = get_distribution
-pkg_resources.__version__ = '0.0.0'
-sys.modules['pkg_resources'] = pkg_resources
-
-# 4. BLOQUER lightning_fabric
-sys.modules['lightning_fabric'] = types.ModuleType('lightning_fabric')
-sys.modules['lightning_fabric.utilities'] = types.ModuleType('lightning_fabric.utilities')
-sys.modules['lightning_fabric.utilities.imports'] = types.ModuleType('lightning_fabric.utilities.imports')
-
-# 5. Imports normaux
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -67,10 +12,6 @@ from datetime import datetime, timedelta
 import torch
 import neuralprophet
 
-print("✅ NeuralProphet importé!")
-print(f"✅ TensorBoardLogger: {pytorch_lightning.loggers.TensorBoardLogger}")
-
-# Suite de ton code...
 # Chargement du modèle
 @st.cache_resource
 def load_model():
@@ -660,6 +601,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
