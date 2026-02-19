@@ -1,23 +1,73 @@
 import sys
+import types
 import os
 
-# Créer un faux module lightning_fabric
-import types
-lightning_fabric = types.ModuleType('lightning_fabric')
-lightning_fabric.utilities = types.ModuleType('lightning_fabric.utilities')
-lightning_fabric.utilities.imports = types.ModuleType('lightning_fabric.utilities.imports')
+# Créer un faux module pkg_resources COMPLET
+pkg_resources = types.ModuleType('pkg_resources')
 
-def fake_import(name, *args, **kwargs):
+# Ajouter toutes les classes et fonctions nécessaires
+class DistributionNotFound(Exception):
+    pass
+
+class VersionConflict(Exception):
+    pass
+
+class UnknownExtra(Exception):
+    pass
+
+def get_distribution(name):
     return None
 
-lightning_fabric.utilities.imports._compare_version = lambda *args: False
-lightning_fabric.utilities.imports._TORCHTEXT_LEGACY = False
+def require(*args, **kwargs):
+    return []
 
-sys.modules['lightning_fabric'] = lightning_fabric
-sys.modules['lightning_fabric.utilities'] = lightning_fabric.utilities
-sys.modules['lightning_fabric.utilities.imports'] = lightning_fabric.utilities.imports
+def resource_filename(package, resource):
+    return ''
 
-# Maintenant tes imports normaux
+def resource_string(package, resource):
+    return b''
+
+def resource_stream(package, resource):
+    return None
+
+def resource_isdir(package, resource):
+    return False
+
+def resource_listdir(package, resource):
+    return []
+
+def cleanup_resources():
+    pass
+
+def declare_namespace(name):
+    pass
+
+def working_set():
+    return []
+
+# Attacher tout au module
+pkg_resources.DistributionNotFound = DistributionNotFound
+pkg_resources.VersionConflict = VersionConflict
+pkg_resources.UnknownExtra = UnknownExtra
+pkg_resources.get_distribution = get_distribution
+pkg_resources.require = require
+pkg_resources.resource_filename = resource_filename
+pkg_resources.resource_string = resource_string
+pkg_resources.resource_stream = resource_stream
+pkg_resources.resource_isdir = resource_isdir
+pkg_resources.resource_listdir = resource_listdir
+pkg_resources.cleanup_resources = cleanup_resources
+pkg_resources.declare_namespace = declare_namespace
+pkg_resources.working_set = working_set
+pkg_resources.__version__ = '0.0.0'
+
+# Injecter dans sys.modules
+sys.modules['pkg_resources'] = pkg_resources
+
+# Bloquer lightning_fabric aussi
+sys.modules['lightning_fabric'] = types.ModuleType('lightning_fabric')
+
+# MAINTENANT tes imports normaux
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -27,7 +77,7 @@ import yfinance as yf
 from datetime import datetime, timedelta
 import torch
 
-# Supprime TOUT le code de patch pkg_resources
+# Le reste de ton code...
 
 # DÉBUT DU FICHIER - APRÈS LES IMPORTS ET LE PATCH
 
@@ -620,6 +670,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
