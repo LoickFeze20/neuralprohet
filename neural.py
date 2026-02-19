@@ -179,36 +179,38 @@ with st.sidebar:
             if "apple_neural.pt" in files:
                 st.sidebar.success("✅ Fichier trouvé!")
                 
-                # Méthode alternative de chargement
-                import pickle
-                with open("apple_neural.pt", 'rb') as f:
-                    model = pickle.load(f)
+                # Chargement SIMPLE
+                model = torch.load("apple_neural.pt", map_location='cpu', weights_only=False)
                 
                 return model
             else:
-                st.sidebar.error("❌ Fichier apple_neural.pt absent de la liste")
+                st.sidebar.error("❌ Fichier absent")
                 return None
         except Exception as e:
             st.sidebar.error(f"Erreur: {e}")
             return None
     
+    # Charger le modèle (APPEL DE LA FONCTION)
+    model = load_model()
+    
+    # Vérification du modèle (HORS de la fonction)
     if model:
-        st.success("✅ Modèle chargé")
+        st.sidebar.success("✅ Modèle chargé")
         # Infos modèle
-        with st.expander("📦 Détails du modèle"):
-            st.write(f"**Type:** NeuralProphet")
-            st.write(f"**Fichier:** apple_neural.pt")
+        with st.sidebar.expander("📦 Détails du modèle"):
+            st.sidebar.write(f"**Type:** NeuralProphet")
+            st.sidebar.write(f"**Fichier:** apple_neural.pt")
             if hasattr(model, 'n_forecasts'):
-                st.write(f"**n_forecasts:** {model.n_forecasts}")
+                st.sidebar.write(f"**n_forecasts:** {model.n_forecasts}")
     else:
-        st.error("❌ Modèle non trouvé")
+        st.sidebar.error("❌ Modèle non trouvé")
     
-    st.markdown("---")
-    
+    st.sidebar.markdown("---")
+
     # Paramètres communs
-    st.subheader("⚙️ Paramètres")
-    jours = st.slider("Horizon de prédiction", 1, 90, 30, 
-                     help="Nombre de jours à prédire")
+    st.sidebar.subheader("⚙️ Paramètres")
+    jours = st.sidebar.slider("Horizon de prédiction", 1, 90, 30, 
+                             help="Nombre de jours à prédire")
 
 
 # Chargement des données (caché) - VERSION STATIQUE POUR CLOUD
@@ -574,6 +576,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
