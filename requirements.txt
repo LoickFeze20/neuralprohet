@@ -1,8 +1,12 @@
-setuptools==69.5.1
+pip==24.0
+setuptools==68.2.2
+wheel==0.41.2
+
 numpy==1.26.4
 pandas==2.2.2
 matplotlib==3.8.4
-plotly
-torch==2.2.2
-neuralprophet==0.7.0
+
+torch==2.1.2
+neuralprophet==0.6.2
+
 streamlit==1.52.1
