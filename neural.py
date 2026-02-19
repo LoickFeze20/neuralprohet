@@ -2,8 +2,19 @@ import sys
 import types
 import os
 
-# 1. BLOQUER holidays
-sys.modules['holidays'] = types.ModuleType('holidays')
+# 1. BLOQUER holidays COMPLÈTEMENT
+holidays = types.ModuleType('holidays')
+holidays.WEEKEND = []
+holidays.HolidayBase = object
+holidays.Turkey = object
+holidays.Finland = object
+holidays.France = object
+holidays.Germany = object
+holidays.Italy = object
+holidays.Spain = object
+holidays.UnitedKingdom = object
+holidays.UnitedStates = object
+sys.modules['holidays'] = holidays
 
 # 2. Créer un faux pkg_resources
 pkg_resources = types.ModuleType('pkg_resources')
@@ -40,7 +51,10 @@ import plotly.express as px
 import yfinance as yf
 from datetime import datetime, timedelta
 import torch
-import neuralprophet  # On croise les doigts !
+import neuralprophet
+
+print("✅ NeuralProphet importé!")
+print(f"✅ Type de holidays: {type(sys.modules['holidays'])}")
 
 # Suite de ton code...
 
@@ -633,6 +647,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
