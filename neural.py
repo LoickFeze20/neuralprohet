@@ -4,7 +4,6 @@ import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
 import yfinance as yf
-from neuralprophet import NeuralProphet
 from datetime import datetime, timedelta
 import torch
 import os
@@ -165,13 +164,16 @@ with st.sidebar:
         </a>
         """, unsafe_allow_html=True)
     
-    # Chargement du modèle
+        # Chargement du modèle avec pickle
     @st.cache_resource
     def load_model():
         try:
-            model = torch.load("apple_neural.pt", map_location='cpu', weights_only=False)
+            import pickle
+            with open("apple_neural.pt", 'rb') as f:
+                model = pickle.load(f)
             return model
         except Exception as e:
+            st.sidebar.error(f"Erreur: {e}")
             return None
     
     model = load_model()
@@ -536,6 +538,7 @@ st.markdown("""
 </div>
 
 """, unsafe_allow_html=True)
+
 
 
 
